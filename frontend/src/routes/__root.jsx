@@ -11,7 +11,7 @@ import ClerkZustandSyncer from '@/components/auth/ClerkZustandSyncer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Navbar2 from '@/components/Navbar';
-import Navbar3 from '@/components/Navbar3';
+import Navbar3 from '@/components/Navbar';
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -42,7 +42,6 @@ function RootComponent() {
         <ClerkZustandSyncer />
         <div className="max-w-7xl mx-auto">
           <Navbar3 />
-          <hr />
           <main>
             <Outlet />
           </main>

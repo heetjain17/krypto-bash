@@ -38,13 +38,21 @@ const CoinChart = ({ chartData, days }) => {
   });
 
   const yAxisTickFormatter = (number) => {
-    if (number > 1000000) {
-      return `$${(number / 1000000).toFixed(1)}M`;
+    if (number >= 1000000) {
+      return `$${(number / 1000000).toFixed(2)}M`;
     }
-    if (number > 1000) {
-      return `$${(number / 1000).toFixed(1)}k`;
+    if (number >= 1000) {
+      return `$${(number / 1000).toFixed(2)}k`;
     }
-    return `$${number}`;
+
+    if (number >= 1) {
+      return `$${number.toFixed(2)}`;
+    }
+
+    if (number > 0.001) {
+      return `$${number.toFixed(4)}`;
+    }
+    return `$${number.toPrecision(2)}`;
   };
 
   const CustomTooltip = ({ active, payload, label }) => {

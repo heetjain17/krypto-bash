@@ -14,7 +14,7 @@ const TimeRangeSwitcher = ({ selectedRange, onRangeChange }) => {
         <button
           key={range.value}
           onClick={() => onRangeChange(range.value)}
-          className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+          className={`px-3 py-1 text-sm font-medium cursor-pointer rounded-md transition-colors ${
             selectedRange === range.value
               ? 'bg-blue-500 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'

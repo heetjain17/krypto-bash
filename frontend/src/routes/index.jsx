@@ -28,7 +28,7 @@ const PAGES_PER_FETCH = API_PER_PAGE / UI_PER_PAGE;
 function RouteComponent() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 1000);
+  const debouncedQuery = useDebounce(query, 500);
   const queryClient = useQueryClient();
   const apiPage = Math.floor((page - 1) / PAGES_PER_FETCH) + 1;
 

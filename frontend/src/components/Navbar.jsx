@@ -1,105 +1,64 @@
-import React, { useState } from 'react';
-import {
-  Navbar,
-  NavBody,
-  NavItems,
-  MobileNav,
-  NavbarLogo,
-  NavbarButton,
-  MobileNavHeader,
-  MobileNavToggle,
-  MobileNavMenu,
-} from './ui/resizable-navbar';
-import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignedOut, UserButton, SignedIn } from '@clerk/clerk-react';
+import { IconDatabase } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import React from 'react';
 
-const Navbar2 = () => {
+const Navbar = () => {
   const navItems = [
     {
-      name: 'Features',
-      link: '#features',
+      name: 'Compare',
+      link: '/compare',
     },
     {
-      name: 'Pricing',
-      link: '#pricing',
+      name: 'Global',
+      link: '#',
     },
     {
-      name: 'Contact',
-      link: '#contact',
+      name: 'Bookmarks',
+      link: '#',
     },
   ];
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   return (
-    <div className="relative w-full px-10">
-      <Navbar>
-        <NavBody>
-          <NavbarLogo to={'/'} />
-          <NavItems items={navItems} />
-          <div className="flex items-center gap-4">
-            <SignedOut>
-              <Link to={'/sign-in'}>
-                <NavbarButton variant="secondary">Sign In</NavbarButton>
-              </Link>
-              <Link to={'/sign-up'}>
-                <NavbarButton variant="primary">Sign Up</NavbarButton>
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </div>
-        </NavBody>
-      </Navbar>
+    <div className="border-b-2 border-neutral-500 flex justify-between py-2 px-4">
+      <Link to={'/'} className="flex gap-2 justify-center items-center">
+        <IconDatabase />
+        <span className="text-lg font-medium text-black dark:text-white">
+          KryptoBash
+        </span>
+      </Link>
+      <div className="flex items-center justify-center font-medium">
+        {navItems.map((item) => (
+          <Link
+            to={item.link}
+            className="hover:bg-neutral-200 py-2 px-3 rounded-4xl transition-all duration-300 ease-in-out"
+            key={item.name}
+          >
+            {item.name}
+          </Link>
+        ))}
+      </div>
 
-      <MobileNav>
-        <MobileNavHeader>
-          <NavbarLogo to={'/'} />
-          <MobileNavToggle
-            isOpen={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          />
-        </MobileNavHeader>
-
-        <MobileNavMenu
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-        >
-          {navItems.map((item, idx) => (
-            <a
-              key={`mobile-link-${idx}`}
-              href={item.link}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="relative text-neutral-600 dark:text-neutral-300"
-            >
-              <span className="block">{item.name}</span>
-            </a>
-          ))}
-          <div className="flex w-full flex-col gap-4">
-            <Link to={'/sign-in'}>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Sign In
-              </NavbarButton>
-            </Link>
-            <Link to={'/sign-up'}>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Sign Up
-              </NavbarButton>
-            </Link>
-          </div>
-        </MobileNavMenu>
-      </MobileNav>
+      <div className="flex gap-2 items-center justify-center font-medium">
+        <SignedOut>
+          <Link
+            to={'/sign-up'}
+            className="py-2 px-4 rounded-lg hover:bg-neutral-200 transition-all duration-300 ease-in-out "
+          >
+            Sign Up
+          </Link>
+          <Link
+            to={'/sign-in'}
+            className="py-2 px-4 bg-neutral-800 hover:bg-neutral-900 text-white rounded-lg transition-all duration-300 ease-in-out "
+          >
+            Sign In
+          </Link>
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
     </div>
   );
 };
 
-export default Navbar2;
+export default Navbar;

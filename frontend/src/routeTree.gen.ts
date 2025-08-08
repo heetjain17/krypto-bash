@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteImport } from './routes/user'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoinCoinSlugRouteImport } from './routes/coin/$coinSlug'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
@@ -18,6 +19,11 @@ import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 const UserRoute = UserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +49,7 @@ const authSignInRoute = authSignInRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
   '/user': typeof UserRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
   '/user': typeof UserRoute
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
   '/user': typeof UserRoute
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
@@ -65,12 +74,19 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/user' | '/sign-in' | '/sign-up' | '/coin/$coinSlug'
+  fullPaths:
+    | '/'
+    | '/compare'
+    | '/user'
+    | '/sign-in'
+    | '/sign-up'
+    | '/coin/$coinSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/user' | '/sign-in' | '/sign-up' | '/coin/$coinSlug'
+  to: '/' | '/compare' | '/user' | '/sign-in' | '/sign-up' | '/coin/$coinSlug'
   id:
     | '__root__'
     | '/'
+    | '/compare'
     | '/user'
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
@@ -79,6 +95,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompareRoute: typeof CompareRoute
   UserRoute: typeof UserRoute
   authSignInRoute: typeof authSignInRoute
   authSignUpRoute: typeof authSignUpRoute
@@ -92,6 +109,13 @@ declare module '@tanstack/react-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -127,6 +151,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompareRoute: CompareRoute,
   UserRoute: UserRoute,
   authSignInRoute: authSignInRoute,
   authSignUpRoute: authSignUpRoute,

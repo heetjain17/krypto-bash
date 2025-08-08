@@ -3,11 +3,24 @@ import TimeRangeSwitcher from './TimeRangeSwitcher';
 import CoinChart from './CoinChart';
 
 const formatCurrency = (number) => {
+  if (number === null || number === undefined) {
+    return '$0.00';
+  }
+
+  if (Math.abs(number) >= 1) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(number);
+  }
+
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 2,
     minimumFractionDigits: 2,
+    maximumFractionDigits: 8,
   }).format(number);
 };
 
@@ -27,13 +40,13 @@ const CoinDetailHeader = ({ coin, chartData, days, setDays }) => {
             </p>
           </div>
         </div>
-        <button className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800 font-semibold py-2 px-4 rounded-lg transition-colors">
+        <button className="bg-neutral-200 cursor-pointer hover:bg-neutral-300 text-neutral-800 font-semibold py-2 px-4 rounded-lg transition-colors">
           Bookmark
         </button>
       </div>
 
       <div className="flex justify-between items-end mb-4">
-        <div>
+        <div className="flex flex-col gap-1">
           <p className="text-4xl font-bold text-neutral-900 tracking-tight">
             {formatCurrency(price)}
           </p>
