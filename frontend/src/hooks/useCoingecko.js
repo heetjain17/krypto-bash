@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import {
   getAllCoinsData,
   getCoinData,
@@ -52,4 +52,26 @@ export const useCoinSearch = (query) => {
     data: coins,
     isLoading: isSearching || isFetchingMarkets,
   };
+};
+
+export const useCompareCoinDetails = (coins) => {
+  return useQueries({
+    queries: coins.map((coin) => ({
+      queryKey: ['coinDetails', coin.id],
+      queryFn: () => getCoinData(coin.id),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      enabled: !!coin.id,
+    })),
+  });
+};
+
+export const useCompareCoinCharts = (coins, days) => {
+  return useQueries({
+    queries: coins.map((coin) => ({
+      queryKey: ['coinChart', coin.id, { days }],
+      queryFn: () => getCoinChart(coin.id, days),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      enabled: !!coin.id && !!days,
+    })),
+  });
 };

@@ -73,7 +73,15 @@ const CoinChart = ({ chartData, days }) => {
   };
 
   return (
-    <div style={{ width: '100%', height: 400 }}>
+    <div
+      style={{
+        width: '100%',
+        height: 400,
+        outline: 'none',
+        boxShadow: 'none',
+      }}
+      className="focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+    >
       <ResponsiveContainer>
         <AreaChart
           data={formattedData}
