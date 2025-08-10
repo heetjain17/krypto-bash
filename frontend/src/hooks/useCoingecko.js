@@ -5,6 +5,8 @@ import {
   getCoinChart,
   searchCoins,
   getMarketsForIds,
+  getGlobalData,
+  getMarketTrends,
 } from '../api/coinGeckoClient';
 
 export const useCoinMarkets = (page = 1, perPage = 10, enabled = true) => {
@@ -73,5 +75,21 @@ export const useCompareCoinCharts = (coins, days) => {
       staleTime: 1000 * 60 * 5, // 5 minutes
       enabled: !!coin.id && !!days,
     })),
+  });
+};
+
+export const useGlobalData = () => {
+  return useQuery({
+    queryKey: ['globalData'],
+    queryFn: getGlobalData,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useMarketTrends = () => {
+  return useQuery({
+    queryKey: ['globalData'],
+    queryFn: getMarketTrends,
+    staleTime: 1000 * 60 * 5,
   });
 };

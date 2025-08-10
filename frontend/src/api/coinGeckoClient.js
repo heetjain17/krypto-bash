@@ -103,3 +103,31 @@ export const getMarketsForIds = async (ids = []) => {
     throw error;
   }
 };
+
+export const getGlobalData = async () => {
+  try {
+    const res = await apiClient.get('/global', {
+      params: {
+        x_cg_demo_api_key: API_KEY,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching global data:`, error);
+    throw error;
+  }
+};
+
+export const getMarketTrends = async () => {
+  try {
+    const res = await apiClient.get('/trends', {
+      params: {
+        x_cg_demo_api_key: API_KEY,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching global data:`, error);
+    throw error;
+  }
+};

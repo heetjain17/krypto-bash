@@ -11,7 +11,7 @@ const Navbar = () => {
     },
     {
       name: 'Global',
-      link: '#',
+      link: '/global',
     },
     {
       name: 'Bookmarks',
