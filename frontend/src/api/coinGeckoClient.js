@@ -52,20 +52,21 @@ export const getCoinData = async (coinId) => {
   }
 };
 
-export const getCoinChart = async (coinId, days = 365) => {
+export const getCoinChart = async (coinId, from, to) => {
   if (!coinId) throw new Error('Coin ID is required.');
 
   try {
-    const res = await apiClient.get(`/coins/${coinId}/market_chart`, {
-      params: {
-        vs_currency: 'usd',
-        days: days,
-        x_cg_demo_api_key: API_KEY,
-      },
-    });
-    return res.data;
+    // Note the new endpoint: /market_chart/range
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart/range?vs_currency=usd&from=${from}&to=${to}`
+    );
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error(`Error fetching market chart for coin ${coinId}:`, error);
+    console.error('Error fetching coin chart data:', error);
     throw error;
   }
 };

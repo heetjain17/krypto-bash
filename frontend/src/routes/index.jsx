@@ -1,12 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import '../styles.css';
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from '@clerk/clerk-react';
-import Navbar from '../components/Navbar';
 import { useCoinMarkets, useCoinSearch } from '@/hooks/useCoingecko';
 import CoinTable from '@/components/homepage/CoinTable';
 import { IconLoader2 } from '@tabler/icons-react';
@@ -97,16 +90,20 @@ function RouteComponent() {
   const hasNextPage = paginatedCoins?.length === API_PER_PAGE;
 
   return (
-    <div className="flex flex-col gap-5 pt-10">
-      <SearchBar value={query} onChange={setQuery} />
-      <div className="flex justify-center">{renderContent()}</div>
+    <div className="flex flex-col gap-5 pt-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      <div className="flex justify-center">
+        <SearchBar value={query} onChange={setQuery} />
+      </div>
+      <div className="flex justify-center w-full">{renderContent()}</div>
       {!debouncedQuery && (
-        <PaginationControls
-          currentPage={page}
-          setPage={setPage}
-          isFetching={isFetching}
-          hasNextPage={hasNextPage}
-        />
+        <div className="flex justify-center">
+          <PaginationControls
+            currentPage={page}
+            setPage={setPage}
+            isFetching={isFetching}
+            hasNextPage={hasNextPage}
+          />
+        </div>
       )}
     </div>
   );

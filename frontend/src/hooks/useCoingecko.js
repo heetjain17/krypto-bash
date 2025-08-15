@@ -29,7 +29,13 @@ export const useCoinDetails = (coinId) => {
 export const useCoinCharts = (coinId, days = 365) => {
   return useQuery({
     queryKey: ['coinChart', coinId, { days }],
-    queryFn: () => getCoinChart(coinId, days),
+    queryFn: () => {
+      const to = Math.floor(Date.now() / 1000);
+      const daysToSubtract = days === 7 ? 6 : days;
+      const from = to - daysToSubtract * 24 * 60 * 60;
+
+      return getCoinChart(coinId, from, to);
+    },
     enabled: !!coinId,
     staleTime: 5 * 60 * 1000,
   });
@@ -71,7 +77,12 @@ export const useCompareCoinCharts = (coins, days) => {
   return useQueries({
     queries: coins.map((coin) => ({
       queryKey: ['coinChart', coin.id, { days }],
-      queryFn: () => getCoinChart(coin.id, days),
+      queryFn: () => {
+        const to = Math.floor(Date.now() / 1000);
+        const daysToSubtract = days === 7 ? 6 : days;
+        const from = to - daysToSubtract * 24 * 60 * 60;
+        return getCoinChart(coin.id, from, to);
+      },
       staleTime: 1000 * 60 * 5, // 5 minutes
       enabled: !!coin.id && !!days,
     })),

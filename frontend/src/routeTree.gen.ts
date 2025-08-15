@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteImport } from './routes/user'
 import { Route as GlobalRouteImport } from './routes/global'
 import { Route as CompareRouteImport } from './routes/compare'
+import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoinCoinSlugRouteImport } from './routes/coin/$coinSlug'
 import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
@@ -30,6 +31,11 @@ const GlobalRoute = GlobalRouteImport.update({
 const CompareRoute = CompareRouteImport.update({
   id: '/compare',
   path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookmarksRoute = BookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,6 +61,7 @@ const authSignInRoute = authSignInRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compare': typeof CompareRoute
   '/global': typeof GlobalRoute
   '/user': typeof UserRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compare': typeof CompareRoute
   '/global': typeof GlobalRoute
   '/user': typeof UserRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bookmarks': typeof BookmarksRoute
   '/compare': typeof CompareRoute
   '/global': typeof GlobalRoute
   '/user': typeof UserRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/bookmarks'
     | '/compare'
     | '/global'
     | '/user'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/bookmarks'
     | '/compare'
     | '/global'
     | '/user'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/bookmarks'
     | '/compare'
     | '/global'
     | '/user'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookmarksRoute: typeof BookmarksRoute
   CompareRoute: typeof CompareRoute
   GlobalRoute: typeof GlobalRoute
   UserRoute: typeof UserRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/compare'
       fullPath: '/compare'
       preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookmarks': {
+      id: '/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookmarksRoute: BookmarksRoute,
   CompareRoute: CompareRoute,
   GlobalRoute: GlobalRoute,
   UserRoute: UserRoute,

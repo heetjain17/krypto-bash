@@ -12,11 +12,26 @@ import {
 
 const COLORS = ['#8884d8', '#ffc658', '#82ca9d', '#ff7300', '#00C49F'];
 
-const CompareChart = ({ chartDataSets, days }) => {
-  const processedData = React.useMemo(() => {
-    if (!chartDataSets || chartDataSets.length === 0) return [];
+// Hook for responsiveness
+const useWindowWidth = () => {
+  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return windowWidth;
+};
 
-    // 1. Normalize each coin's data to show percentage change
+const CompareChart = ({ chartDataSets, days }) => {
+  const windowWidth = useWindowWidth();
+  const isMobile = windowWidth < 768;
+
+  const { processedData, ticks } = React.useMemo(() => {
+    if (!chartDataSets || chartDataSets.length === 0)
+      return { processedData: [], ticks: [] };
+
+    // Normalize each coin's data to show percentage change
     const normalizedSets = chartDataSets.map((dataSet) => {
       if (!dataSet.prices || dataSet.prices.length === 0) return [];
       const basePrice = dataSet.prices[0][1];
@@ -27,19 +42,14 @@ const CompareChart = ({ chartDataSets, days }) => {
       }));
     });
 
-    // --- CORRECTED MERGING LOGIC ---
-    // 2. Merge all data points into a single timeline
+    // Merge data
     const mergedData = {};
-
     const allTimestamps = new Set();
-    normalizedSets.forEach((normalizedSet) => {
-      normalizedSet.forEach((point) => allTimestamps.add(point.timestamp));
-    });
-
-    // Convert set to sorted array of unique timestamps
+    normalizedSets.forEach((set) =>
+      set.forEach((point) => allTimestamps.add(point.timestamp))
+    );
     const sortedTimestamps = Array.from(allTimestamps).sort((a, b) => a - b);
 
-    // Fill mergedData with all timestamps and set all coin ids to null
     sortedTimestamps.forEach((timestamp) => {
       mergedData[timestamp] = { timestamp };
       chartDataSets.forEach((coin) => {
@@ -47,10 +57,9 @@ const CompareChart = ({ chartDataSets, days }) => {
       });
     });
 
-    // Fill actual values from each normalized set
-    normalizedSets.forEach((normalizedSet, index) => {
+    normalizedSets.forEach((set, index) => {
       const coinId = chartDataSets[index].id;
-      normalizedSet.forEach((point) => {
+      set.forEach((point) => {
         if (mergedData[point.timestamp]) {
           mergedData[point.timestamp][coinId] = point.value;
         }
@@ -62,31 +71,23 @@ const CompareChart = ({ chartDataSets, days }) => {
     );
     const coinIds = chartDataSets.map((coin) => coin.id);
 
+    // Fill gaps with interpolation
     coinIds.forEach((coinId) => {
-      let lastKnownIndex = -1;
-
-      // Find the first valid value to start interpolation from
       const firstValidIndex = dataArray.findIndex(
         (point) => point[coinId] !== null
       );
-      if (firstValidIndex === -1) return; // No data for this coin at all
-
-      lastKnownIndex = firstValidIndex;
-
+      if (firstValidIndex === -1) return;
+      let lastKnownIndex = firstValidIndex;
       for (let i = firstValidIndex + 1; i < dataArray.length; i++) {
         if (dataArray[i][coinId] !== null) {
           const gapLength = i - lastKnownIndex - 1;
-          // If there is a gap between the last known point and the current one
           if (gapLength > 0) {
             const prevValue = dataArray[lastKnownIndex][coinId];
             const nextValue = dataArray[i][coinId];
-
-            // Fill the gap with interpolated values
             for (let j = 1; j <= gapLength; j++) {
               const gapIndex = lastKnownIndex + j;
-              const interpolatedValue =
+              dataArray[gapIndex][coinId] =
                 prevValue + (nextValue - prevValue) * (j / (gapLength + 1));
-              dataArray[gapIndex][coinId] = interpolatedValue;
             }
           }
           lastKnownIndex = i;
@@ -94,8 +95,8 @@ const CompareChart = ({ chartDataSets, days }) => {
       }
     });
 
-    // 3. Format the date and sort the final array
-    return dataArray.map((dataPoint) => {
+    // Format dates like CoinChart
+    const formattedData = dataArray.map((dataPoint) => {
       const dateObject = new Date(dataPoint.timestamp);
       let formattedDate;
       if (days === 1) {
@@ -116,7 +117,23 @@ const CompareChart = ({ chartDataSets, days }) => {
       }
       return { ...dataPoint, date: formattedDate };
     });
-  }, [chartDataSets, days]);
+
+    // Generate ticks like CoinChart
+    const desiredTickCount = isMobile ? 6 : 8;
+    const uniqueDates = [
+      ...new Map(formattedData.map((item) => [item.date, item])).values(),
+    ];
+    const effectiveTickCount = Math.min(uniqueDates.length, desiredTickCount);
+    const tickInterval = Math.max(
+      1,
+      Math.floor(uniqueDates.length / effectiveTickCount)
+    );
+    const generatedTicks = uniqueDates
+      .filter((_, index) => index % tickInterval === 0)
+      .map((item) => item.date);
+
+    return { processedData: formattedData, ticks: generatedTicks };
+  }, [chartDataSets, days, isMobile]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -144,28 +161,41 @@ const CompareChart = ({ chartDataSets, days }) => {
     return null;
   };
 
+  if (processedData.length === 0) {
+    return (
+      <div style={{ height: 400 }} className="flex items-center justify-center">
+        <p>Loading chart data...</p>
+      </div>
+    );
+  }
+
   return (
-    <div tabIndex={-1} style={{ width: '100%', height: 400 }}>
+    <div style={{ width: '100%', height: isMobile ? 300 : 400 }}>
       <ResponsiveContainer>
         <AreaChart
           data={processedData}
-          margin={{ top: 10, right: 30, left: 25, bottom: 0 }}
+          margin={{
+            top: 10,
+            right: isMobile ? 10 : 30,
+            left: isMobile ? 0 : 25,
+            bottom: 0,
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
           <XAxis
             dataKey="date"
+            ticks={ticks}
             tick={{ fontSize: 12, fill: '#666' }}
-            interval="preserveStartEnd"
-            minTickGap={30}
+            interval={0}
           />
           <YAxis
             tickFormatter={(tick) => `${tick.toFixed(0)}%`}
             tick={{ fontSize: 12, fill: '#666' }}
             domain={['auto', 'auto']}
+            orientation={isMobile ? 'right' : 'left'}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-
           {chartDataSets.map((coin, index) => (
             <Area
               key={coin.id}

@@ -16,7 +16,7 @@ const PaginationControls = ({
   };
 
   return (
-    <div className="flex justify-center items-center gap-6 mt-8 mb-4">
+    <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 mt-6 mb-4 w-full px-2">
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1 || isFetching}

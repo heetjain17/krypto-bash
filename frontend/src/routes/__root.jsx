@@ -1,17 +1,11 @@
-import {
-  createRootRoute,
-  Link,
-  Outlet,
-  useNavigate,
-} from '@tanstack/react-router';
+import { createRootRoute, Outlet, useNavigate } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import '../styles.css';
 import { ClerkProvider } from '@clerk/clerk-react';
 import ClerkZustandSyncer from '@/components/auth/ClerkZustandSyncer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import Navbar2 from '@/components/Navbar';
-import Navbar3 from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -41,15 +35,15 @@ function RootComponent() {
       >
         <ClerkZustandSyncer />
         <div className="max-w-7xl mx-auto">
-          <Navbar3 />
+          <Navbar />
           <main>
             <Outlet />
           </main>
         </div>
       </ClerkProvider>
-      <TanStackRouterDevtools position="bottom-right" />
+      {/* <TanStackRouterDevtools position="bottom-right" />
 
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }
