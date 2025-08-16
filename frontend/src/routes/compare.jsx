@@ -1,13 +1,11 @@
-import { getCoinChart } from '@/api/coinGeckoClient';
 import TimeRangeSwitcher from '@/components/coin/TimeRangeSwitcher';
 import CoinPill from '@/components/compare/CoinPill';
 import CompareChart from '@/components/compare/CompareChart';
 import CompareHeader from '@/components/compare/CompareHeader';
-import CompareSearchBar from '@/components/compare/compareSearchBar';
+import CompareSearchBar from '@/components/compare/CompareSearchBar';
 import CompareStatsTable from '@/components/compare/CompareStats';
 import { useCompareCoinCharts } from '@/hooks/useCoingecko';
 import { IconLoader2 } from '@tabler/icons-react';
-import { useQueries } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 
