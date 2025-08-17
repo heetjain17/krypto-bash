@@ -14,7 +14,9 @@ const COLORS = ['#8884d8', '#ffc658', '#82ca9d', '#ff7300', '#00C49F'];
 
 // Hook for responsiveness
 const useWindowWidth = () => {
-  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = React.useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
   React.useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -27,11 +29,9 @@ const CompareChart = ({ chartDataSets, days }) => {
   const windowWidth = useWindowWidth();
   const isMobile = windowWidth < 768;
 
-  const { processedData, ticks } = React.useMemo(() => {
-    if (!chartDataSets || chartDataSets.length === 0)
-      return { processedData: [], ticks: [] };
+  const processedData = React.useMemo(() => {
+    if (!chartDataSets || chartDataSets.length === 0) return [];
 
-    // Normalize each coin's data to show percentage change
     const normalizedSets = chartDataSets.map((dataSet) => {
       if (!dataSet.prices || dataSet.prices.length === 0) return [];
       const basePrice = dataSet.prices[0][1];
@@ -42,7 +42,6 @@ const CompareChart = ({ chartDataSets, days }) => {
       }));
     });
 
-    // Merge data
     const mergedData = {};
     const allTimestamps = new Set();
     normalizedSets.forEach((set) =>
@@ -71,7 +70,6 @@ const CompareChart = ({ chartDataSets, days }) => {
     );
     const coinIds = chartDataSets.map((coin) => coin.id);
 
-    // Fill gaps with interpolation
     coinIds.forEach((coinId) => {
       const firstValidIndex = dataArray.findIndex(
         (point) => point[coinId] !== null
@@ -95,7 +93,6 @@ const CompareChart = ({ chartDataSets, days }) => {
       }
     });
 
-    // Format dates like CoinChart
     const formattedData = dataArray.map((dataPoint) => {
       const dateObject = new Date(dataPoint.timestamp);
       let formattedDate;
@@ -118,29 +115,17 @@ const CompareChart = ({ chartDataSets, days }) => {
       return { ...dataPoint, date: formattedDate };
     });
 
-    // Generate ticks like CoinChart
-    const desiredTickCount = isMobile ? 6 : 8;
-    const uniqueDates = [
-      ...new Map(formattedData.map((item) => [item.date, item])).values(),
-    ];
-    const effectiveTickCount = Math.min(uniqueDates.length, desiredTickCount);
-    const tickInterval = Math.max(
-      1,
-      Math.floor(uniqueDates.length / effectiveTickCount)
-    );
-    const generatedTicks = uniqueDates
-      .filter((_, index) => index % tickInterval === 0)
-      .map((item) => item.date);
-
-    return { processedData: formattedData, ticks: generatedTicks };
-  }, [chartDataSets, days, isMobile]);
+    return formattedData;
+  }, [chartDataSets, days]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const dataPoint = payload[0].payload;
       return (
         <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-sm">
-          <p className="text-sm text-gray-600 mb-2">{dataPoint.date}</p>
+          <p className="text-sm text-gray-600 mb-2">
+            {new Date(dataPoint.timestamp).toLocaleString()}
+          </p>
           {chartDataSets.map((coin, index) => {
             const value = dataPoint[coin.id];
             return (
@@ -163,54 +148,68 @@ const CompareChart = ({ chartDataSets, days }) => {
 
   if (processedData.length === 0) {
     return (
-      <div style={{ height: 400 }} className="flex items-center justify-center">
+      <div
+        style={{ height: isMobile ? 300 : 400 }}
+        className="flex items-center justify-center text-neutral-500"
+      >
         <p>Loading chart data...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ width: '100%', height: isMobile ? 300 : 400 }}>
-      <ResponsiveContainer>
-        <AreaChart
-          data={processedData}
-          margin={{
-            top: 10,
-            right: isMobile ? 10 : 30,
-            left: isMobile ? 0 : 25,
-            bottom: 0,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis
-            dataKey="date"
-            ticks={ticks}
-            tick={{ fontSize: 12, fill: '#666' }}
-            interval={0}
-          />
-          <YAxis
-            tickFormatter={(tick) => `${tick.toFixed(0)}%`}
-            tick={{ fontSize: 12, fill: '#666' }}
-            domain={['auto', 'auto']}
-            orientation={isMobile ? 'right' : 'left'}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-          {chartDataSets.map((coin, index) => (
-            <Area
-              key={coin.id}
-              type="monotone"
-              dataKey={coin.id}
-              name={coin.name}
-              stroke={COLORS[index % COLORS.length]}
-              fillOpacity={0.1}
-              fill={COLORS[index % COLORS.length]}
-              strokeWidth={2}
-              connectNulls
+    // CHANGED: Added a wrapper div for negative margins on mobile
+    <div className="-mx-4 md:mx-0">
+      <div style={{ width: '100%', height: isMobile ? 300 : 400 }}>
+        <ResponsiveContainer>
+          <AreaChart
+            data={processedData}
+            margin={{
+              // CHANGED: Tightened margins for mobile
+              top: isMobile ? 20 : 10,
+              right: isMobile ? 5 : 30,
+              left: isMobile ? -10 : 25,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 12, fill: '#666' }}
+              interval="preserveStartEnd"
+              minTickGap={isMobile ? 20 : 40}
             />
-          ))}
-        </AreaChart>
-      </ResponsiveContainer>
+            <YAxis
+              tickFormatter={(tick) => `${tick.toFixed(0)}%`}
+              tick={{ fontSize: 12, fill: '#666' }}
+              domain={['auto', 'auto']}
+              orientation={isMobile ? 'right' : 'left'}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+              verticalAlign={isMobile ? 'top' : 'bottom'}
+              wrapperStyle={{
+                // CHANGED: Compact legend style for mobile
+                [isMobile ? 'top' : 'bottom']: isMobile ? -10 : 0,
+                fontSize: isMobile ? '11px' : '12px',
+              }}
+            />
+            {chartDataSets.map((coin, index) => (
+              <Area
+                key={coin.id}
+                type="monotone"
+                dataKey={coin.id}
+                name={coin.name}
+                stroke={COLORS[index % COLORS.length]}
+                fillOpacity={0.1}
+                fill={COLORS[index % COLORS.length]}
+                strokeWidth={2}
+                connectNulls
+              />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

@@ -42,8 +42,9 @@ const CoinDetailHeader = ({ coin, chartData, days, setDays }) => {
   return (
     <div className="mb-12">
       {/* --- Section 1: Coin Info & Bookmark Button --- */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-        <div className="flex items-center gap-4 mb-4 md:mb-0">
+      <div className="flex justify-between items-center mb-4">
+        {/* Coin Info */}
+        <div className="flex items-center gap-4">
           <img src={coin.image.large} alt={coin.name} className="h-10 w-10" />
           <div>
             <h1 className="text-2xl font-bold text-neutral-800">{coin.name}</h1>
@@ -53,17 +54,20 @@ const CoinDetailHeader = ({ coin, chartData, days, setDays }) => {
           </div>
         </div>
 
-        {/* --- Responsive Bookmark Button --- */}
-        <div className="w-full md:w-auto">
+        {/* NEW: Bookmark Button is now here */}
+        <div>
           <SignedIn>
             <button
               onClick={handleBookmarkClick}
               disabled={isLoading}
-              className={`flex w-full cursor-pointer md:w-auto items-center justify-center gap-2 font-semibold py-2 px-4 rounded-lg transition-all duration-200 ease-in-out  ${
-                isBookmarked
-                  ? 'bg-neutral-800 text-white hover:bg-neutral-700'
-                  : 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300'
-              }`}
+              className={`flex cursor-pointer items-center justify-center rounded-lg transition-all duration-200 ease-in-out
+                w-10 h-10 p-0  // Mobile: square icon-only button
+                md:w-auto md:py-2 md:px-4 md:gap-2 // Desktop: expands to include text
+                ${
+                  isBookmarked
+                    ? 'bg-neutral-800 text-white hover:bg-neutral-700'
+                    : 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300'
+                }`}
             >
               {isBookmarked ? (
                 <IconBookmarkFilled size={18} />
@@ -89,7 +93,8 @@ const CoinDetailHeader = ({ coin, chartData, days, setDays }) => {
 
       {/* --- Section 2: Price & Time Switcher --- */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-4 gap-4">
-        <div className="flex flex-col gap-1 order-2 md:order-1">
+        {/* Price Info */}
+        <div className="flex flex-col gap-1">
           <p className="text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
             {formatCurrency(price)}
           </p>
@@ -101,7 +106,8 @@ const CoinDetailHeader = ({ coin, chartData, days, setDays }) => {
             {priceChange.toFixed(2)}% (24h)
           </p>
         </div>
-        <div className="order-1 md:order-2 self-end md:self-auto">
+        {/* Time Switcher */}
+        <div className="self-end md:self-auto">
           <TimeRangeSwitcher selectedRange={days} onRangeChange={setDays} />
         </div>
       </div>

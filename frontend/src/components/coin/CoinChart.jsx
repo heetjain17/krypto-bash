@@ -11,7 +11,9 @@ import {
 
 // A simple hook to get the window width, useful for responsiveness
 const useWindowWidth = () => {
-  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = React.useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
 
   React.useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -27,14 +29,13 @@ const CoinChart = ({ chartData, days }) => {
   const isMobile = windowWidth < 768; // md breakpoint
 
   // Memoize the formatted data to avoid recalculating on every render
-  const { formattedData, ticks } = React.useMemo(() => {
-    if (!chartData?.prices) return { formattedData: [], ticks: [] };
+  const formattedData = React.useMemo(() => {
+    if (!chartData?.prices) return [];
 
-    const data = chartData.prices.map((priceEntry) => {
+    return chartData.prices.map((priceEntry) => {
       const dateObject = new Date(priceEntry[0]);
       let formattedDate;
 
-      // Determine date format based on the time range
       if (days === 1) {
         formattedDate = dateObject.toLocaleTimeString('en-US', {
           hour: '2-digit',
@@ -53,31 +54,12 @@ const CoinChart = ({ chartData, days }) => {
       }
 
       return {
-        fullDate: dateObject.toLocaleString(), // Keep full date for tooltip
+        fullDate: dateObject.toLocaleString(),
         date: formattedDate,
         price: priceEntry[1],
       };
     });
-
-    // --- Logic to create a clean set of X-axis ticks ---
-    const desiredTickCount = isMobile ? 6 : 8; // CHANGED: 7 to 8 for desktop, 5 to 6 for mobile
-    const uniqueDates = [
-      ...new Map(data.map((item) => [item.date, item])).values(),
-    ];
-
-    // Ensure we don't try to create more ticks than available unique dates
-    const effectiveTickCount = Math.min(uniqueDates.length, desiredTickCount);
-
-    const tickInterval = Math.max(
-      1,
-      Math.floor(uniqueDates.length / effectiveTickCount)
-    );
-    const generatedTicks = uniqueDates
-      .filter((_, index) => index % tickInterval === 0)
-      .map((item) => item.date);
-
-    return { formattedData: data, ticks: generatedTicks };
-  }, [chartData, days, isMobile]);
+  }, [chartData, days]);
 
   // Formatter for Y-axis ticks
   const yAxisTickFormatter = (number) => {
@@ -89,7 +71,7 @@ const CoinChart = ({ chartData, days }) => {
   };
 
   // Custom Tooltip component for a cleaner look
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-neutral-300 rounded-lg shadow-lg">
@@ -108,10 +90,12 @@ const CoinChart = ({ chartData, days }) => {
     return null;
   };
 
-  // If there's no data, don't render the chart
   if (formattedData.length === 0) {
     return (
-      <div style={{ height: 400 }} className="flex items-center justify-center">
+      <div
+        style={{ height: isMobile ? 300 : 400 }}
+        className="flex items-center justify-center text-neutral-500"
+      >
         <p>Loading chart data...</p>
       </div>
     );
@@ -124,9 +108,9 @@ const CoinChart = ({ chartData, days }) => {
           data={formattedData}
           margin={{
             top: 10,
-            right: isMobile ? 10 : 30,
-            left: isMobile ? 0 : 25,
-            bottom: 0,
+            right: isMobile ? 15 : 30,
+            left: isMobile ? 5 : 25,
+            bottom: 5,
           }}
         >
           <defs>
@@ -140,16 +124,17 @@ const CoinChart = ({ chartData, days }) => {
 
           <XAxis
             dataKey="date"
-            ticks={ticks} // Use our generated ticks
             tick={{ fontSize: 12, fill: '#666' }}
-            interval={0} // Let the `ticks` prop control the display
+            // --- CHANGED: Switched to a more robust, automatic way of handling ticks ---
+            interval="preserveStartEnd" // Always show the first and last label
+            minTickGap={isMobile ? 30 : 50} // Ensure minimum space between labels
           />
 
           <YAxis
             tickFormatter={yAxisTickFormatter}
             tick={{ fontSize: 12, fill: '#666' }}
             domain={['dataMin', 'dataMax']}
-            orientation={isMobile ? 'right' : 'left'} // Move Y-axis on mobile
+            orientation={isMobile ? 'right' : 'left'}
           />
 
           <Tooltip content={<CustomTooltip />} />
