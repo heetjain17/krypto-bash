@@ -82,7 +82,6 @@ function RouteComponent() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[minmax(160px,auto)]">
-          {/* Market Cap */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-2 lg:row-span-2">
             <StatCard
               icon={<IconWorld className="w-5 h-5" />}
@@ -108,7 +107,6 @@ function RouteComponent() {
             />
           </div>
 
-          {/* 24h Volume */}
           <StatCard
             icon={<IconActivity className="w-5 h-5" />}
             title="24h Trading Volume"
@@ -116,14 +114,12 @@ function RouteComponent() {
             chartData={volumeChartData}
           />
 
-          {/* Active Coins */}
           <StatCard
             icon={<IconCoins className="w-5 h-5" />}
             title="Active Coins"
             value={formatNumber(globalData.active_cryptocurrencies)}
           />
 
-          {/* BTC & ETH Dominance */}
           <StatCard
             icon={<IconTrendingUp className="w-5 h-5" />}
             title="BTC & ETH Dominance"
@@ -132,14 +128,12 @@ function RouteComponent() {
             )}% / ${globalData.market_cap_percentage.eth.toFixed(1)}%`}
           />
 
-          {/* Tracked Exchanges */}
           <StatCard
             icon={<IconBuildingBank className="w-5 h-5" />}
             title="Tracked Exchanges"
             value={formatNumber(globalData.markets)}
           />
 
-          {/* Ongoing ICOs */}
           <StatCard
             icon={<IconRocket className="w-5 h-5" />}
             title="Ongoing ICOs"

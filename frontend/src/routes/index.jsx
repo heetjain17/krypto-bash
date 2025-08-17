@@ -72,11 +72,13 @@ function RouteComponent() {
         </div>
       );
     }
+
     if (isError) {
       return (
         <p className="text-center text-red-500 py-10">Error fetching data.</p>
       );
     }
+
     if (paginatedCoins) {
       const pageIndexInBatch = (page - 1) % PAGES_PER_FETCH;
       const startIndex = pageIndexInBatch * UI_PER_PAGE;
